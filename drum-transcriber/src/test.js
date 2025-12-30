@@ -1,8 +1,13 @@
+// test.js
+
+// 1. Use 'import' instead of 'require'
+import readline from 'readline';
+import { performance } from 'perf_hooks'; // Node.js specific import for high-precision time
+
 // --- CONFIGURATION ---
 const BPM = 120;
-const MS_PER_BEAT = 60000 / BPM; // 500ms per quarter note at 120 BPM
+const MS_PER_BEAT = 60000 / BPM; 
 
-// The Drum Map
 const keyMap = {
     'a': 'Kick',
     's': 'Snare',
@@ -10,11 +15,11 @@ const keyMap = {
     'f': 'Crash'
 };
 
-// --- STATE (The Buffer) ---
+// --- STATE ---
 let pendingNote = null; 
 let flushTimeout = null;
 
-// --- HELPER: The Quantizer ---
+// --- HELPER ---
 function classifyDuration(deltaMs) {
     const beats = deltaMs / MS_PER_BEAT;
     
@@ -26,56 +31,50 @@ function classifyDuration(deltaMs) {
     return "Thirty-Second Note (1/32)";
 }
 
-// --- NODE.JS KEYBOARD LISTENER ---
-// This enables "Raw Mode" so we can catch individual key presses without hitting Enter
-const readline = require('readline');
+// --- KEYBOARD SETUP ---
 readline.emitKeypressEvents(process.stdin);
 if (process.stdin.isTTY) {
     process.stdin.setRawMode(true);
 }
 
 console.log("-----------------------------------------------------");
-console.log("🥁 DRUM TRANSCRIBER LOGIC TEST (NODE.JS)");
+console.log("🥁 DRUM TRANSCRIBER (ES MODULE MODE)");
 console.log("Press 'a' (Kick) or 's' (Snare). Press 'q' to quit.");
 console.log("-----------------------------------------------------");
 
 process.stdin.on('keypress', (str, key) => {
-    // Allow user to quit
+    // Exit handler
     if (key.name === 'q' || (key.ctrl && key.name === 'c')) {
         process.exit();
     }
 
     const drumType = keyMap[key.name];
-    if (!drumType) return; // Ignore other keys
+    if (!drumType) return; 
 
-    // --- EXACT SAME LOGIC AS BEFORE STARTS HERE ---
-    
+    // --- LOGIC ---
     const now = performance.now();
     
-    // LOG: Immediate hit
+    // Immediate Feedback
     console.log(`\n🥁 HIT: [${drumType}] at ${Math.round(now)}ms`);
 
-    // 2. Clear Flush
+    // Clear Timeout
     if (flushTimeout) clearTimeout(flushTimeout);
 
-    // 3. Sliding Window Logic
+    // Sliding Window Calculation
     if (pendingNote) {
         const delta = now - pendingNote.time;
         const durationName = classifyDuration(delta);
 
-        // We use ANSI codes (\x1b...) for color in terminal, since %c doesn't work in Node
-        console.log(`\x1b[32m✅ COMMITTED: The previous ${pendingNote.type} was a ${durationName} (${Math.round(delta)}ms)\x1b[0m`);
+        // Green Text for Success
+        console.log(`\x1b[32m✅ COMMITTED: Previous ${pendingNote.type} was a ${durationName} (${Math.round(delta)}ms)\x1b[0m`);
     } else {
-        console.log(`ℹ️ First hit. Waiting for next hit to calculate duration...`);
+        console.log(`ℹ️ First hit. Waiting for next hit...`);
     }
 
-    // 4. Shift Buffer
-    pendingNote = {
-        type: drumType,
-        time: now
-    };
+    // Shift Buffer
+    pendingNote = { type: drumType, time: now };
 
-    // 5. Flush Safety Valve
+    // Set Safety Flush
     flushTimeout = setTimeout(() => {
         if (pendingNote) {
             console.log(`\x1b[33m🛑 END OF PHRASE: Flushing final ${pendingNote.type} as Whole Note\x1b[0m`);
