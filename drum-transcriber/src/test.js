@@ -1,3 +1,5 @@
+//file was utilized to develop logic algorithm for program
+
 import readline from 'readline'; //for keyboard reading
 import { performance } from 'perf_hooks'; // Node.js import for more accurate time
 
