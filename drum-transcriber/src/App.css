@@ -4,7 +4,7 @@
   line-height: 1.5;
   font-weight: 400;
   color: #213547;
-  background-color: #f9fafb; /* Light gray background */
+  background-color: #f9fafb;
 }
 
 body {
@@ -21,7 +21,8 @@ body {
   padding: 2rem;
 }
 
-/* Layout Classes used in App.tsx */
+/* --- Layout Classes --- */
+
 .container {
   display: flex;
   flex-direction: column;
@@ -40,6 +41,30 @@ body {
   margin: 0;
   font-size: 1.5rem;
   color: #111827;
+}
+
+/* NEW: Layout for the right side of the header */
+.controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* NEW: Basic styling for the Clear Button */
+button {
+  cursor: pointer;
+  background-color: white;
+  border: 1px solid #fee2e2; /* light red border */
+  color: #dc2626; /* red text */
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem; /* rounded corners */
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #fef2f2; /* light red bg on hover */
 }
 
 .main-content {

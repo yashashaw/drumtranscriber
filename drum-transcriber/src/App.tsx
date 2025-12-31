@@ -1,25 +1,41 @@
 import { SheetMusic } from './components/Canvas/SheetMusic';
 import { MidiStatus } from './components/Controls/MidiStatus';
 import { useTranscriber } from './hooks/useTranscriber';
-import './App.css'
+import { useScoreStore } from './store/scoreStore'; // Import the store to get the clear function
+import './App.css';
 
 function App() {
-  // Initialize the "Brain" (currently sleeping in the skeleton version)
+  // 1. Activate the Logic Engine
   useTranscriber();
+
+  // 2. Get the clear function
+  const clearScore = useScoreStore((state) => state.clearScore);
 
   return (
     <div className="container">
       <header className="header">
         <h1>Drum Transcriber</h1>
-        <MidiStatus />
+        <div className="controls">
+          <MidiStatus />
+          {/* A new button to wipe the sheet clean */}
+          <button 
+            onClick={clearScore}
+            className="px-3 py-1 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50"
+          >
+            Clear Sheet
+          </button>
+        </div>
       </header>
 
       <main className="main-content">
         <SheetMusic />
         
         <div className="instructions">
-          <p>Graphics Test Mode</p>
-          <small>Plug in a MIDI device (if logic was active) or just admire the empty staff!</small>
+          <p className="font-bold text-gray-800">Ready to Record</p>
+          <small>
+            Play your electronic drums. The system will detect notes, 
+            calculate duration, and transcribe chords automatically.
+          </small>
         </div>
       </main>
     </div>
