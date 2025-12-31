@@ -1,10 +1,7 @@
-// test.js
+import readline from 'readline'; //for keyboard reading
+import { performance } from 'perf_hooks'; // Node.js import for more accurate time
 
-// 1. Use 'import' instead of 'require'
-import readline from 'readline';
-import { performance } from 'perf_hooks'; // Node.js specific import for high-precision time
-
-// --- CONFIGURATION ---
+//Constants
 const BPM = 120;
 const MS_PER_BEAT = 60000 / BPM; 
 
@@ -15,11 +12,11 @@ const keyMap = {
     'f': 'Crash'
 };
 
-// --- STATE ---
+//State
 let pendingNote = null; 
 let flushTimeout = null;
 
-// --- HELPER ---
+//Takes in the change in time between notes and returns a string stating the note classification
 function classifyDuration(deltaMs) {
     const beats = deltaMs / MS_PER_BEAT;
     
@@ -31,7 +28,7 @@ function classifyDuration(deltaMs) {
     return "Thirty-Second Note (1/32)";
 }
 
-// --- KEYBOARD SETUP ---
+//keyboard setup
 readline.emitKeypressEvents(process.stdin);
 if (process.stdin.isTTY) {
     process.stdin.setRawMode(true);
@@ -42,28 +39,29 @@ console.log("🥁 DRUM TRANSCRIBER (ES MODULE MODE)");
 console.log("Press 'a' (Kick) or 's' (Snare). Press 'q' to quit.");
 console.log("-----------------------------------------------------");
 
+//event listener
 process.stdin.on('keypress', (str, key) => {
-    // Exit handler
+    //exit handler
     if (key.name === 'q' || (key.ctrl && key.name === 'c')) {
         process.exit();
     }
 
-    const drumType = keyMap[key.name];
+    const drumType = keyMap[key.name]; //searches for key in the object
     if (!drumType) return; 
 
     // --- LOGIC ---
-    const now = performance.now();
+    const now = performance.now(); //gets specific time at hit
     
-    // Immediate Feedback
+    //Immediate Feedback
     console.log(`\n🥁 HIT: [${drumType}] at ${Math.round(now)}ms`);
 
     // Clear Timeout
-    if (flushTimeout) clearTimeout(flushTimeout);
+    if (flushTimeout) clearTimeout(flushTimeout); //flushing happens at 2000 ms
 
-    // Sliding Window Calculation
+    //Sliding Window Calculation
     if (pendingNote) {
-        const delta = now - pendingNote.time;
-        const durationName = classifyDuration(delta);
+        const delta = now - pendingNote.time; //change in time between two notes in ms
+        const durationName = classifyDuration(delta); //inputs the delta, returns a string
 
         // Green Text for Success
         console.log(`\x1b[32m✅ COMMITTED: Previous ${pendingNote.type} was a ${durationName} (${Math.round(delta)}ms)\x1b[0m`);
@@ -71,14 +69,14 @@ process.stdin.on('keypress', (str, key) => {
         console.log(`ℹ️ First hit. Waiting for next hit...`);
     }
 
-    // Shift Buffer
+    //Shift Buffer
     pendingNote = { type: drumType, time: now };
 
-    // Set Safety Flush
+    //Set Safety Flush
     flushTimeout = setTimeout(() => {
         if (pendingNote) {
             console.log(`\x1b[33m🛑 END OF PHRASE: Flushing final ${pendingNote.type} as Whole Note\x1b[0m`);
             pendingNote = null;
         }
-    }, 2000);
+    }, 2000); //2000 ms
 });
