@@ -6,28 +6,29 @@ export function useKeyboard() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // 1. Prevent trigger spam if key is held down
+      //prevent spam typing (eg. "aaaaaa")
       if (event.repeat) return;
 
-      // 2. Ignore typing in inputs/textareas
+      //ignore typing in input and textareas
       const target = event.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
 
-      // 3. Look up the MIDI number
+      //look up MIDI number
       const key = event.key.toLowerCase();
       const note = KEYBOARD_MAP[key];
 
-      // 4. If mapped, trigger the "Pulse"
+      //if mapped, update state
       if (note) {
         setKeyboardNote(note);
         
-        // Clear it shortly after to allow re-triggering the same note
+        //clear it shortly after to allow re-triggering the same note
         setTimeout(() => setKeyboardNote(null), 10);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     
+    //if exist the component, delete Event Listener
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };

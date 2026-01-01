@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 export function useMidi() {
-  const [lastNote, setLastNote] = useState<number | null>(null);
+  const [midiNote, setMidiNote] = useState<number | null>(null);
 
   useEffect(() => {
     if (!navigator.requestMIDIAccess) {
@@ -17,8 +17,8 @@ export function useMidi() {
       const velocity = event.data[2];
       
       if ((command === 144 || command === 153) && velocity > 0) {
-        setLastNote(note);
-        setTimeout(() => setLastNote(null), 10);
+        setMidiNote(note);
+        setTimeout(() => setMidiNote(null), 10);
       }
     };
 
@@ -41,5 +41,5 @@ export function useMidi() {
 
   }, []);
 
-  return { lastNote };
+  return { midiNote };
 }
