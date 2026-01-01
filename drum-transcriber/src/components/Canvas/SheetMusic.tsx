@@ -9,17 +9,12 @@ const STAVE_WIDTH = 250;
 const SYSTEM_HEIGHT = 150; 
 const PADDING = 10;
 const BEATS_PER_MEASURE = 4;
+const MEASURE_BATCH_SIZE = 4; // New config for the "chunks" of 4
 
 export const SheetMusic: React.FC = () => {
-  // REF 1: The Wrapper (Handles scrollbar)
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  
-  // REF 2: The VexFlow Target (Where music is drawn)
   const rendererRef = useRef<HTMLDivElement>(null);
-  
-  // REF 3: The Anchor (An invisible element at the very bottom)
   const bottomAnchorRef = useRef<HTMLDivElement>(null);
-
   const notes = useScoreStore((state) => state.notes);
 
   const getDurationValue = (duration: string): number => {
@@ -37,20 +32,19 @@ export const SheetMusic: React.FC = () => {
   useEffect(() => {
     if (!rendererRef.current || !scrollContainerRef.current) return;
 
-    // FIX 1: Lock the height to prevent collapse (and the jump to top)
+    // FIX 1: Lock height to prevent jumpiness
     const currentHeight = rendererRef.current.clientHeight;
     rendererRef.current.style.height = `${currentHeight}px`;
 
-    // 1. Clear the drawing area
+    // 1. Clear Canvas
     rendererRef.current.innerHTML = '';
     
-    // 2. Safe width calculation
+    // 2. Calculate Width
     const containerWidth = Math.max(800, scrollContainerRef.current.clientWidth - 40);
-
     const renderer = new Renderer(rendererRef.current, Renderer.Backends.SVG);
     const context = renderer.getContext();
 
-    // 3. Group Notes
+    // 3. Group Notes into Measures (Existing Logic)
     const measures: RenderedNote[][] = [];
     let currentMeasure: RenderedNote[] = [];
     let currentBeats = 0;
@@ -67,44 +61,61 @@ export const SheetMusic: React.FC = () => {
     });
     if (currentMeasure.length > 0) measures.push(currentMeasure);
 
-    // 4. Draw Loop
+    // --- NEW LOGIC START ---
+    
+    // 4. Determine Total Staves (Multiples of 4)
+    // If we have 0 measures, we want 4. If we have 5, we want 8.
+    const filledCount = measures.length;
+    // Math.max(1, ...) ensures we start with at least 1 chunk if empty
+    const totalStaves = Math.ceil(Math.max(filledCount, 1) / MEASURE_BATCH_SIZE) * MEASURE_BATCH_SIZE;
+
+    // 5. Draw Loop (Iterate through ALL staves, empty or full)
     let x = PADDING;
     let y = 20;
 
-    measures.forEach((measureNotes, index) => {
+    for (let i = 0; i < totalStaves; i++) {
+      // A. Handle Wrapping
       if (x + STAVE_WIDTH > containerWidth) {
         x = PADDING;
         y += SYSTEM_HEIGHT;
       }
 
+      // B. Draw the Stave (Empty Box)
       const stave = new Stave(x, y, STAVE_WIDTH);
-      if (index === 0 || x === PADDING) {
+      
+      // Add Clef/TimeSig to the very first stave, OR the first stave of a new line
+      if (i === 0 || x === PADDING) {
         stave.addClef("percussion");
-        if (index === 0) stave.addTimeSignature("4/4");
+        if (i === 0) stave.addTimeSignature("4/4");
       }
       stave.setContext(context).draw();
 
-      if (measureNotes.length > 0) {
+      // C. Draw Notes (If this measure exists in our data)
+      const measureNotes = measures[i]; // May be undefined if we are in the "empty" zone
+      
+      if (measureNotes && measureNotes.length > 0) {
         const vexNotes = convertToVexNotes(measureNotes);
         const voice = new Voice({ numBeats: BEATS_PER_MEASURE, beatValue: 4 });
+        
+        // Strict: false allows us to render incomplete measures without crashing
         voice.setStrict(false);
         voice.addTickables(vexNotes);
+        
         new Formatter().joinVoices([voice]).format([voice], STAVE_WIDTH - 50);
         voice.draw(context, stave);
       }
+
+      // D. Advance Cursor
       x += STAVE_WIDTH;
-    });
+    }
+    // --- NEW LOGIC END ---
 
-    // 5. Calculate Final Height
+    // 6. Final Resize
     const finalHeight = y + SYSTEM_HEIGHT;
-
-    // FIX 2: Set the specific height style on the DIV
     rendererRef.current.style.height = `${finalHeight}px`;
-    
-    // FIX 3: Update VexFlow size
     renderer.resize(containerWidth, finalHeight);
 
-    // 6. Scroll to anchor
+    // 7. Scroll
     bottomAnchorRef.current?.scrollIntoView({ 
       behavior: "smooth", 
       block: "nearest" 
@@ -118,18 +129,15 @@ export const SheetMusic: React.FC = () => {
       className="p-4 bg-white border rounded shadow-md overflow-y-auto relative"
       style={{ height: '400px', width: '100%' }}
     >
-      {/* The Music */}
       <div ref={rendererRef} />
 
-      {/* TEXT (Moves down as music grows) */}
       <div className="text-center py-8 text-gray-500">
-          <small>
-            Play your electronic drums. The system will detect notes, 
-            calculate duration, and transcribe chords automatically.
-          </small>
+        <small>
+          Play your electronic drums. The system will detect notes, 
+          calculate duration, and transcribe chords automatically.
+        </small>
       </div>
       
-      {/* The Invisible Anchor - Always sits at the bottom */}
       <div ref={bottomAnchorRef} style={{ height: 1 }} />
     </div>
   );
