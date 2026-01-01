@@ -30,13 +30,6 @@ function App() {
       <main className="main-content">
         <SheetMusic />
         
-        <div className="instructions">
-          <p className="font-bold text-gray-800">Ready to Record</p>
-          <small>
-            Play your electronic drums. The system will detect notes, 
-            calculate duration, and transcribe chords automatically.
-          </small>
-        </div>
       </main>
     </div>
   );
