@@ -3,6 +3,7 @@ import { MidiStatus } from './components/Controls/MidiStatus';
 import { useTranscriber } from './hooks/useTranscriber';
 import { useScoreStore } from './store/scoreStore'; // Import the store to get the clear function
 import './App.css';
+import { exportToPDF } from './utils/exportPDF';
 
 function App() {
   // 1. Activate the Logic Engine
@@ -25,7 +26,7 @@ function App() {
             Clear Sheet
           </button>
           <button
-            onClick={clearScore}
+            onClick={() => exportToPDF()}
             className="export-btn"
           >
             Export PDF
