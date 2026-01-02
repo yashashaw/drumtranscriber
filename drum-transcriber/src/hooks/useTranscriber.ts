@@ -4,6 +4,8 @@ import { classifyDuration } from '../utils/quantizer';
 import { MIDI_TO_DRUM } from '../utils/drumMap';
 import type { DrumType } from '../types';
 import { useInput } from './useInput';
+import axios from 'axios';
+import type { NoteDuration } from '../types';
 
 interface PendingHit {
   type: DrumType;
@@ -39,13 +41,18 @@ export function useTranscriber(bpm: number = 120) {
         // It's a chord! Add to the pile and don't draw anything yet.
         pendingBuffer.current.push({ type: drumType, time: now });
       } else {
-        // It's a new rhythmic step! 
-        // Commit the OLD pile as a finished note/chord
-        addNote({
+        const noteData = {
           id: crypto.randomUUID(),
-          types: pendingBuffer.current.map(h => h.type), // Extract all drums
+          types: pendingBuffer.current.map(h => h.type),
           duration: duration,
           isRest: false
+        };
+        
+        addNote(noteData);
+        
+        // Send to backend (pseudo link for now)
+        axios.post("/api/link", noteData).catch(error => {
+          console.error('Error saving note:', error);
         });
 
         // Start a NEW pile with the current hit
@@ -59,12 +66,20 @@ export function useTranscriber(bpm: number = 120) {
     // 3. Set Safety Flush (End of Phrase)
     flushTimeout.current = window.setTimeout(() => {
       if (pendingBuffer.current.length > 0) {
-        addNote({
+        const noteData = {
           id: crypto.randomUUID(),
           types: pendingBuffer.current.map(h => h.type),
-          duration: 'w', // Default to whole note if you stop playing
+          duration: 'w' as NoteDuration,
           isRest: false
+        };
+
+        addNote(noteData);
+
+        // Send to backend
+        axios.post("/api/notes", noteData).catch(error => {
+          console.error('Error saving note:', error);
         });
+
         pendingBuffer.current = [];
       }
     }, 2000);
