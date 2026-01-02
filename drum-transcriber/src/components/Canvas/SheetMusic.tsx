@@ -19,9 +19,9 @@ export const SheetMusic: React.FC = () => {
 
   const getDurationValue = (duration: string): number => {
     switch (duration.replace(/\W/g, '')) {
-      case 'w': return 4;
-      case 'h': return 2;
-      case 'q': return 1;
+      case '1': return 4;
+      case '2': return 2;
+      case '4': return 1;
       case '8': return 0.5;
       case '16': return 0.25;
       case '32': return 0.125;

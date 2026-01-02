@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
+from lilypond import convert_to_lilypond
 
 app = FastAPI()
 
@@ -36,3 +37,7 @@ async def get_notes():
 async def clear_notes():
     notes.clear()
     return {"message": "All notes cleared"}
+
+@app.get("/api/export")
+async def export_pdf():
+    return convert_to_lilypond(notes)

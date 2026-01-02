@@ -69,7 +69,7 @@ export function useTranscriber(bpm: number = 120) {
         const noteData = {
           id: crypto.randomUUID(),
           types: pendingBuffer.current.map(h => h.type),
-          duration: 'w' as NoteDuration,
+          duration: '1' as NoteDuration,
           isRest: false
         };
 
