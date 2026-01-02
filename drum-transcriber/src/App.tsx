@@ -24,6 +24,12 @@ function App() {
           >
             Clear Sheet
           </button>
+          <button
+            onClick={clearScore}
+            className="export-btn"
+          >
+            Export PDF
+          </button>
         </div>
       </header>
 
