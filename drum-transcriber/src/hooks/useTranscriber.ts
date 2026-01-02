@@ -51,7 +51,7 @@ export function useTranscriber(bpm: number = 120) {
         addNote(noteData);
         
         // Send to backend (pseudo link for now)
-        axios.post("/api/link", noteData).catch(error => {
+        axios.post("http://127.0.0.1:5000/api/notes", noteData).catch(error => {
           console.error('Error saving note:', error);
         });
 
