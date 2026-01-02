@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { RenderedNote } from '../types';
+import axios from 'axios';
 
 interface ScoreState {
   notes: RenderedNote[];
@@ -16,5 +17,12 @@ export const useScoreStore = create<ScoreState>((set) => ({
     notes: [...state.notes, note] 
   })),
 
-  clearScore: () => set({ notes: [] }),
+  clearScore: () => {
+    set({ notes: [] });
+    
+    // Clear backend too
+    axios.delete("http://localhost:5000/api/notes").catch(error => {
+      console.error('Error clearing backend:', error);
+    });
+  },
 }));

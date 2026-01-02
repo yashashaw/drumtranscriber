@@ -31,3 +31,8 @@ async def create_note(note: Note):
 @app.get("/api/notes")
 async def get_notes():
     return notes
+
+@app.delete("/api/notes")
+async def clear_notes():
+    notes.clear()
+    return {"message": "All notes cleared"}
