@@ -1,12 +1,11 @@
-import axios from 'axios';
+import { fetchPDFExport } from "../api/api";
 
 export const exportToPDF = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/export', {
-      responseType: 'blob',
-    });
+    // This looks exactly the same!
+    const blobData = await fetchPDFExport();
 
-    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const url = window.URL.createObjectURL(new Blob([blobData]));
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', 'drum-transcription.pdf');

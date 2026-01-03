@@ -25,3 +25,11 @@ export const fetchNotes = async (): Promise<RenderedNote[]> => {
     return []; // Return empty array to prevent app crash
   }
 };
+
+export const fetchPDFExport = async (): Promise<Blob> => {
+  const response = await apiClient.get('/export', { 
+    responseType: 'blob', 
+  });
+  
+  return response.data;
+};
