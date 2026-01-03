@@ -2,10 +2,9 @@ import { useEffect, useRef } from 'react';
 import { useScoreStore } from '../store/scoreStore';
 import { classifyDuration } from '../utils/quantizer';
 import { MIDI_TO_DRUM } from '../utils/drumMap';
-import type { DrumType } from '../types';
+import type { DrumType, NoteDuration } from '../types';
 import { useInput } from './useInput';
-import axios from 'axios';
-import type { NoteDuration } from '../types';
+import { saveNote } from '../api/api';
 
 interface PendingHit {
   type: DrumType;
@@ -15,7 +14,7 @@ interface PendingHit {
 export function useTranscriber(bpm: number = 120) {
   const { lastNote } = useInput();
   const addNote = useScoreStore((state) => state.addNote);
-  
+
   // State from your file
   const pendingBuffer = useRef<PendingHit[]>([]); // Array to hold chords
   const flushTimeout = useRef<number | null>(null);
@@ -47,13 +46,13 @@ export function useTranscriber(bpm: number = 120) {
           duration: duration,
           isRest: false
         };
-        
+
         addNote(noteData);
-        
-        // Send to backend (pseudo link for now)
-        axios.post("http://127.0.0.1:5000/api/notes", noteData).catch(error => {
-          console.error('Error saving note:', error);
-        });
+
+        saveNote(noteData)
+          .catch(error => {
+            console.error('Error saving note:', error);
+          });
 
         // Start a NEW pile with the current hit
         pendingBuffer.current = [{ type: drumType, time: now }];
@@ -75,10 +74,10 @@ export function useTranscriber(bpm: number = 120) {
 
         addNote(noteData);
 
-        // Send to backend
-        axios.post("http://127.0.0.1:5000/api/notes", noteData).catch(error => {
-          console.error('Error saving note:', error);
-        });
+        saveNote(noteData)
+          .catch(error => {
+            console.error('Error saving note:', error);
+          });
 
         pendingBuffer.current = [];
       }

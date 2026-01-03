@@ -12,6 +12,14 @@ const apiClient = axios.create({
   },
 });
 
+// for saveNote function
+export interface NotePayload {
+  id: string;
+  types: string[];
+  duration: string;
+  isRest: boolean;
+}
+
 /**
  * GET: Fetch all notes from the database.
  * Used when the page reloads.
@@ -31,5 +39,15 @@ export const fetchPDFExport = async (): Promise<Blob> => {
     responseType: 'blob', 
   });
   
+  return response.data;
+};
+
+export const saveNote = async (noteData: NotePayload) => {
+  const response = await apiClient.post('/notes', noteData);
+  return response.data;
+};
+
+export const clearAllNotes = async () => {
+  const response = await apiClient.delete('/notes');
   return response.data;
 };
