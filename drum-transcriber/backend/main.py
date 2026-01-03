@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
@@ -25,7 +25,7 @@ notes = []
 @app.post("/api/notes")
 async def create_note(note: Note):
     print(f"Received note: {note}")
-    notes.append(note.model_dump())
+    notes.append(note)
     print(f"Total notes: {len(notes)}")
     return {"message": "Note saved", "note": note}
 
@@ -40,4 +40,10 @@ async def clear_notes():
 
 @app.get("/api/export")
 async def export_pdf():
-    return convert_to_lilypond(notes)
+    
+    pdf_bytes, error = await convert_to_lilypond(notes) 
+    
+    if error:
+        return Response(content=error, status_code=500)
+        
+    return Response(content=pdf_bytes, media_type="application/pdf")
