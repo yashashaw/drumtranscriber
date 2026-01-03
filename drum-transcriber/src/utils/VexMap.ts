@@ -3,12 +3,12 @@ import type { RenderedNote, DrumType } from '../types';
 
 // The Visual Dictionary
 const DRUM_PITCHES: Record<DrumType, string> = {
-  'kick': 'f/4',           
-  'snare': 'c/5',          
-  'hihat_closed': 'g/5/X0',
-  'hihat_open': 'g/5/X0',  
-  'crash': 'a/5/X0',       
-  'ride': 'f/5/X0'         
+  'bd': 'f/4',           
+  'sn': 'c/5',          
+  'hhc': 'g/5/X0',
+  'hho': 'g/5/X0',  
+  'cymc': 'a/5/X0',       
+  'cymr': 'f/5/X0'         
 };
 
 export const convertToVexNotes = (notes: RenderedNote[]) => {
@@ -27,7 +27,7 @@ export const convertToVexNotes = (notes: RenderedNote[]) => {
 
     // 3. Handle Articulations (like Hi-Hat Open)
     // We check if ANY of the drums in the chord need the 'o' symbol
-    if (note.types.includes('hihat_open')) {
+    if (note.types.includes('hho')) {
        staveNote.addModifier(new Articulation('a@a').setPosition(3)); 
     }
 
