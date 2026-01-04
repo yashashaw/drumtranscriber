@@ -4,10 +4,13 @@ import { useScoreStore } from './store/scoreStore'; // Import the store to get t
 import './App.css';
 import { exportToPDF } from './utils/exportPDF';
 import { BpmControl } from './components/Controls/BpmControl';
+import { useMetronome } from './hooks/useMetronome';
 
 function App() {
-  // 1. Activate the Logic Engine
+  // 1. Activate the Logic Engine and Metronome
   useTranscriber();
+
+  useMetronome();
 
   // 2. Get the clear function
   const clearScore = useScoreStore((state) => state.clearScore);

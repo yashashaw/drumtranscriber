@@ -9,11 +9,14 @@ interface ScoreState {
   setBpm: (newBpm: number) => void;   
   clearScore: () => void;
   loadNotesFromBackend: () => Promise<void>;
+  isMetronomeOn: boolean;             
+  toggleMetronome: () => void;        
 }
 
 export const useScoreStore = create<ScoreState>((set) => ({
   notes: [],
-  bpm: 120,                            
+  bpm: 120,
+  isMetronomeOn: false,                            
 
   addNote: (note) => set((state) => ({
     notes: [...state.notes, note]
@@ -36,4 +39,8 @@ export const useScoreStore = create<ScoreState>((set) => ({
       set({ notes: fetchedNotes });
     }
   },
+
+  toggleMetronome: () => set((state) => ({ 
+    isMetronomeOn: !state.isMetronomeOn 
+  })),
 }));
