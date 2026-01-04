@@ -65,6 +65,23 @@ Open a new terminal (keep the backend running!) and navigate to the project root
 
 ## 🎹 How to Use
 
-1. Connect a MIDI Device (optional): Plug in your electronic drum kit or MIDI keyboard via USB, or use keys on the keyboard to simulate MIDI input. 
-2. Play: Start playing! Notes will appear on the stave in real-time.
-3. Export: Click "Export PDF" to download a PDF of your score. 
+1.  Connect a Device (Optional)
+    Plug in your electronic drum kit or MIDI keyboard via USB. The app will automatically detect MIDI input.
+
+2.  ...Or Use Your Computer Keyboard
+    No MIDI device? No problem. Use your keyboard to simulate drum hits:
+
+    | Key | Instrument | MIDI Note |
+    | :--- | :--- | :--- |
+    | **A** | Bass Drum | 36 |
+    | **S** | Snare Drum | 38 |
+    | **D** | Hi-Hat (Closed) | 42 |
+    | **F** | Hi-Hat (Open) | 46 |
+    | **Space** | Crash Cymbal | 49 |
+    | **J** | Ride Cymbal | 51 |
+
+3.  Play
+    Start drumming! Your notes will appear on the sheet music stave in real-time.
+
+4.  Export
+    Finished? Click the **Export PDF** button to download a professional score of your performance.
