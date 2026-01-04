@@ -1,9 +1,9 @@
 import { SheetMusic } from './components/Canvas/SheetMusic';
-import { MidiStatus } from './components/Controls/MidiStatus';
 import { useTranscriber } from './hooks/useTranscriber';
 import { useScoreStore } from './store/scoreStore'; // Import the store to get the clear function
 import './App.css';
 import { exportToPDF } from './utils/exportPDF';
+import { BpmControl } from './components/Controls/BpmControl';
 
 function App() {
   // 1. Activate the Logic Engine
@@ -17,7 +17,7 @@ function App() {
       <header className="header">
         <h1>Drum Transcriber</h1>
         <div className="controls">
-          <MidiStatus />
+          <BpmControl />
           {/* A new button to wipe the sheet clean */}
           <button 
             onClick={clearScore}

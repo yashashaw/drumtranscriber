@@ -4,18 +4,22 @@ import { fetchNotes, clearAllNotes } from '../api/api';
 
 interface ScoreState {
   notes: RenderedNote[];
-  // Fix: Explicitly say that addNote takes a 'note' argument
+  bpm: number;                         
   addNote: (note: RenderedNote) => void;
+  setBpm: (newBpm: number) => void;   
   clearScore: () => void;
   loadNotesFromBackend: () => Promise<void>;
 }
 
 export const useScoreStore = create<ScoreState>((set) => ({
   notes: [],
+  bpm: 120,                            
 
   addNote: (note) => set((state) => ({
     notes: [...state.notes, note]
   })),
+
+  setBpm: (newBpm) => set({ bpm: newBpm }),
 
   clearScore: () => {
     set({ notes: [] });
