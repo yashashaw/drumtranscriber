@@ -11,9 +11,10 @@ interface PendingHit {
   time: number;
 }
 
-export function useTranscriber(bpm: number = 120) {
+export function useTranscriber() {
   const { lastNote } = useInput();
   const addNote = useScoreStore((state) => state.addNote);
+  const bpm = useScoreStore((state) => state.bpm);
 
   // State from your file
   const pendingBuffer = useRef<PendingHit[]>([]); // Array to hold chords
