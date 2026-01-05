@@ -1,73 +1,87 @@
-# React + TypeScript + Vite
+# 🥁 MIDI Drum Transcriber
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack application that listens to real-time MIDI input (electronic drums/keyboards) and automatically transcribes it into sheet music using VexFlow. The application features a React frontend for visualization and a Python/FastAPI backend for logic and persistence.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+* Real-time MIDI Transcription: Connect any MIDI device and see notes appear instantly.
+* Smart Quantization: Automatically snaps messy playing to the nearest grid (1/8th, 1/16th notes).
+* Sheet Music Rendering: Uses VexFlow to render professional standard drum notation.
+* State Management: Powered by Zustand for high-performance React state handling.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* Frontend: React, TypeScript, VexFlow, Zustand
+* Backend: Python 3.14, FastAPI, Uvicorn
+* Tools: Vite, npm, pip
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📦 Installation & Setup
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Follow these steps to get the project running locally.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### 1. Clone the Repository
+   git clone https://github.com/YOUR_USERNAME/REPO_NAME.git
+   cd drum-transcriber
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### 2. Backend Setup (Python API)
+The backend handles data processing and runs on Port 5000.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+1. Navigate to the backend folder:
+   cd backend
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+2. Create and activate a virtual environment:
+   (Windows)
+   python -m venv .venv
+   .\.venv\Scripts\Activate
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+   (Mac/Linux)
+   python3 -m venv .venv
+   source .venv/bin/activate
+
+3. Install dependencies:
+   pip install -r requirements.txt
+
+4. Start the Server:
+   python -m uvicorn main:app --reload --port 5000
+
+   (You should see: Uvicorn running on http://127.0.0.1:5000)
+
+---
+
+### 3. Frontend Setup (React)
+Open a new terminal (keep the backend running!) and navigate to the project root.
+
+1. Install Node dependencies:
+   npm install
+
+2. Start the Development Server:
+   npm run dev
+
+3. Open your browser to the local URL (usually http://localhost:5173).
+
+---
+
+## 🎹 How to Use
+
+1.  Connect a Device (Optional)
+    Plug in your electronic drum kit or MIDI keyboard via USB. The app will automatically detect MIDI input.
+
+2.  ...Or Use Your Computer Keyboard
+    No MIDI device? No problem. Use your keyboard to simulate drum hits:
+
+    | Key | Instrument | MIDI Note |
+    | :--- | :--- | :--- |
+    | **A** | Bass Drum | 36 |
+    | **S** | Snare Drum | 38 |
+    | **D** | Hi-Hat (Closed) | 42 |
+    | **F** | Hi-Hat (Open) | 46 |
+    | **Space** | Crash Cymbal | 49 |
+    | **J** | Ride Cymbal | 51 |
+
+3.  Play
+    Start drumming! Your notes will appear on the sheet music stave in real-time.
+
+4.  Export
+    Finished? Click the **Export PDF** button to download a professional score of your performance.
