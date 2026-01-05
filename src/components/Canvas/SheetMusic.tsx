@@ -4,12 +4,13 @@ import { useScoreStore } from '../../store/scoreStore';
 import { convertToVexNotes } from '../../utils/VexMap';
 import type { RenderedNote } from '../../types';
 
-// --- CONFIGURATION ---
-const STAVE_WIDTH = 250;
+const MIN_STAVE_WIDTH = 250; // Mimumum measure width
 const SYSTEM_HEIGHT = 150;
-const PADDING = 10;
+const START_X = 10;
+const START_Y = 20;
 const BEATS_PER_MEASURE = 4;
 const MEASURE_BATCH_SIZE = 4;
+const NOTE_PADDING = 60; // The breathing room at the end of a measure
 
 export const SheetMusic: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -31,23 +32,23 @@ export const SheetMusic: React.FC = () => {
     }
   };
 
-  // 2. NEW: Trigger reload on mount
+  // 2. Trigger reload on mount
   useEffect(() => {
     loadNotesFromBackend();
   }, [loadNotesFromBackend]);
 
-  // 3. Existing VexFlow Logic
+  // 3. VexFlow Logic
   useEffect(() => {
     if (!rendererRef.current || !scrollContainerRef.current) return;
 
-    // FIX 1: Lock height to prevent jumpiness
+    // Lock height to prevent jumpiness during re-render
     const currentHeight = rendererRef.current.clientHeight;
     rendererRef.current.style.height = `${currentHeight}px`;
 
     // Clear Canvas
     rendererRef.current.innerHTML = '';
 
-    // Calculate Width
+    // Calculate Container Width
     const containerWidth = Math.max(800, scrollContainerRef.current.clientWidth - 40);
     const renderer = new Renderer(rendererRef.current, Renderer.Backends.SVG);
     const context = renderer.getContext();
@@ -69,42 +70,68 @@ export const SheetMusic: React.FC = () => {
     });
     if (currentMeasure.length > 0) measures.push(currentMeasure);
 
-    // Determine Total Staves
+    // Determine Total Staves (filling out the last batch if needed)
     const filledCount = measures.length;
     const totalStaves = Math.ceil(Math.max(filledCount, 1) / MEASURE_BATCH_SIZE) * MEASURE_BATCH_SIZE;
 
-    // Draw Loop
-    let x = PADDING;
-    let y = 20;
+    // --- DRAW LOOP ---
+    let x = START_X;
+    let y = START_Y;
 
     for (let i = 0; i < totalStaves; i++) {
-      if (x + STAVE_WIDTH > containerWidth) {
-        x = PADDING;
-        y += SYSTEM_HEIGHT;
-      }
-
-      const stave = new Stave(x, y, STAVE_WIDTH);
-
-      if (i === 0 || x === PADDING) {
-        stave.addClef("percussion");
-        if (i === 0) stave.addTimeSignature("4/4");
-      }
-      stave.setContext(context).draw();
-
       const measureNotes = measures[i];
+      
+      // 1. Calculate Required Width
+      // We assume the minimum, then check if notes push it wider
+      let measureWidth = MIN_STAVE_WIDTH;
+      let voice: Voice | null = null;
+      let formatter: Formatter | null = null;
 
+      // Only calculate dynamic width if there are actually notes
       if (measureNotes && measureNotes.length > 0) {
         const vexNotes = convertToVexNotes(measureNotes);
-        const voice = new Voice({ numBeats: BEATS_PER_MEASURE, beatValue: 4 });
-
+        voice = new Voice({ numBeats: BEATS_PER_MEASURE, beatValue: 4 });
         voice.setStrict(false);
         voice.addTickables(vexNotes);
 
-        new Formatter().joinVoices([voice]).format([voice], STAVE_WIDTH - 50);
+        // Join voice to calculate width
+        formatter = new Formatter().joinVoices([voice]);
+        
+        // Ask VexFlow: "How much space do these notes strictly need?"
+        const minRequiredWidth = formatter.preCalculateMinTotalWidth([voice]);
+        
+        // Final width is the MAX of (Default vs Required + Padding)
+        measureWidth = Math.max(MIN_STAVE_WIDTH, minRequiredWidth + NOTE_PADDING);
+      }
+
+      // 2. Check for Line Wrap
+      // If adding this measure exceeds container width, wrap to next line
+      if (x + measureWidth > containerWidth) {
+        x = START_X;
+        y += SYSTEM_HEIGHT;
+      }
+
+      // 3. Create and Draw Stave
+      const stave = new Stave(x, y, measureWidth);
+
+      // Add clef/time signature at the start of a line (or first measure)
+      if (i === 0 || x === START_X) {
+        stave.addClef("percussion");
+        if (i === 0) stave.addTimeSignature("4/4");
+      }
+      
+      stave.setContext(context).draw();
+
+      // 4. Draw Notes (if they exist)
+      if (voice && formatter) {
+        // Use the calculated width minus padding for formatting
+        // This ensures the notes stop BEFORE they hit the barline
+        formatter.format([voice], measureWidth - NOTE_PADDING);
         voice.draw(context, stave);
       }
 
-      x += STAVE_WIDTH;
+      // 5. Advance X Position
+      x += measureWidth;
     }
 
     // Final Resize
@@ -112,7 +139,7 @@ export const SheetMusic: React.FC = () => {
     rendererRef.current.style.height = `${finalHeight}px`;
     renderer.resize(containerWidth, finalHeight);
 
-    // Scroll
+    // Scroll to bottom
     bottomAnchorRef.current?.scrollIntoView({
       behavior: "smooth",
       block: "nearest"
@@ -134,7 +161,6 @@ export const SheetMusic: React.FC = () => {
           calculate duration, and transcribe chords automatically.
         </small>
       </div>
-
 
       <div ref={bottomAnchorRef} style={{ height: 1 }} />
     </div>
