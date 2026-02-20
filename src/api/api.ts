@@ -1,10 +1,10 @@
 import axios from 'axios';
 import type { RenderedNote } from '../types';
 
-// Centralized base URL
+// centralized base URL (change with production code)
 const API_BASE_URL = 'http://localhost:5000/api';
 
-// Create an axios instance (optional but good practice)
+// axios instance
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
