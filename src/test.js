@@ -73,7 +73,7 @@ process.stdin.on('keypress', (str, key) => {
             const allNotes = pendingNote.map(n => n.type).join(" + ");
 
             // 2. Green Text for Success
-            console.log(`\x1b[32m✅ COMMITTED: Previous ${allNotes} was a ${durationName} (${Math.round(delta)}ms)\x1b[0m`);
+            console.log(`\x1b[32m✅ Previous ${allNotes} was a ${durationName} (${Math.round(delta)}ms)\x1b[0m`);
 
             // Shift Buffer
             pendingNote = [{ type: drumType, time: now }];
@@ -90,7 +90,7 @@ process.stdin.on('keypress', (str, key) => {
     flushTimeout = setTimeout(() => {
         if (pendingNote) {
             const finalNotes = pendingNote.map(n => n.type).join(" + ");
-            console.log(`\x1b[33m🛑 END OF PHRASE: Flushing final [${finalNotes}] as Whole Note\x1b[0m`);
+            console.log(`\x1b[33m🛑 Flushing final [${finalNotes}] as Whole Note\x1b[0m`);
             pendingNote = null;
         }
     }, 2000); //2000 ms
