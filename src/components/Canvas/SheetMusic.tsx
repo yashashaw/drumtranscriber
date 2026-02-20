@@ -74,7 +74,7 @@ export const SheetMusic: React.FC = () => {
     const filledCount = measures.length;
     const totalStaves = Math.ceil(Math.max(filledCount, 1) / MEASURE_BATCH_SIZE) * MEASURE_BATCH_SIZE;
 
-    // --- DRAW LOOP ---
+    // -- Draw Loop --
     let x = START_X;
     let y = START_Y;
 
@@ -125,12 +125,12 @@ export const SheetMusic: React.FC = () => {
       // 4. Draw Notes (if they exist)
       if (voice && formatter) {
         // Use the calculated width minus padding for formatting
-        // This ensures the notes stop BEFORE they hit the barline
+        // This ensures the notes stop before they hit the barline
         formatter.format([voice], measureWidth - NOTE_PADDING);
         voice.draw(context, stave);
       }
 
-      // 5. Advance X Position
+      // 5. advance X Position
       x += measureWidth;
     }
 
