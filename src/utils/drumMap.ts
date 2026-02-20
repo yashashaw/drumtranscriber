@@ -21,8 +21,6 @@ export const MIDI_TO_DRUM: Record<number, DrumType> = {
   51: 'cymr',           // Ride Cymbal 1
   59: 'cymr',           // Ride Cymbal 2
   
-  // Toms (Optional - mapping these to existing types or ignoring them for now)
-  // You can add more DrumTypes to your types.ts if you want to support toms later.
 };
 
 export const KEYBOARD_MAP: Record<string, number> = {
@@ -32,5 +30,4 @@ export const KEYBOARD_MAP: Record<string, number> = {
   'f': 46, // Hi-Hat Open
   ' ': 49, // Crash (Spacebar maps to Crash 1)
   'j': 51, // Ride (Ride Cymbal 1)
-  // You can map 'z' or 'x' to Toms if you add them later
 };
