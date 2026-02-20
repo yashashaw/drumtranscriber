@@ -43,11 +43,11 @@ async def convert_to_lilypond(notes):
 """
 
     try:
-        # Write the file
+        # write the file
         with open(ly_filename, "w") as f:
             f.write(lilypond_content)
 
-        # --- THE SMART PART: CHOOSE EXECUTION METHOD ---
+        # -- choose execution method --
         
         if sys.platform == "win32":
             # WINDOWS (Development): run synchronously to avoid NotImplementedError
