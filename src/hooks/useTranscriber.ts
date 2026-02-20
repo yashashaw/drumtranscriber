@@ -33,7 +33,7 @@ export function useTranscriber() {
 
     // 2. Sliding Window Logic
     if (pendingBuffer.current.length > 0) {
-      // Calculate delta from the FIRST note in the pending group
+      // calculate delta from the first note in the pending group
       const delta = now - pendingBuffer.current[0].time;
       const duration = classifyDuration(delta, bpm);
 
@@ -55,7 +55,7 @@ export function useTranscriber() {
             console.error('Error saving note:', error);
           });
 
-        // Start a NEW pile with the current hit
+        // Start a new pile with the current hit
         pendingBuffer.current = [{ type: drumType, time: now }];
       }
     } else {
@@ -63,7 +63,7 @@ export function useTranscriber() {
       pendingBuffer.current = [{ type: drumType, time: now }];
     }
 
-    // 3. Set Safety Flush (End of Phrase)
+    // 3. Set safety flush
     flushTimeout.current = window.setTimeout(() => {
       if (pendingBuffer.current.length > 0) {
         const noteData = {
