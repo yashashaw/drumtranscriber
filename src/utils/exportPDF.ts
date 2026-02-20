@@ -2,7 +2,6 @@ import { fetchPDFExport } from "../api/api";
 
 export const exportToPDF = async () => {
   try {
-    // This looks exactly the same!
     const blobData = await fetchPDFExport();
 
     const url = window.URL.createObjectURL(new Blob([blobData]));
